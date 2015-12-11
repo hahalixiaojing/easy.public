@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema
+targetNamespace="http://www.39541240.com/triggers"
+elementFormDefault="qualified"
+xmlns:mstns="http://tempuri.org/XMLSchema.xsd"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns="http://www.39541240.com/triggers"
+xmlns:vs="http://schemas.microsoft.com/Visual-Studio-Intellisense"
+vs:friendlyname="trigger Configuration Schema"
+vs:ishtmlschema="false"
+vs:iscasesensitive="true"
+vs:requireattributequotes="true"
+vs:defaultnamespacequalifier=""
+vs:defaultnsprefix="" >
+
+  <xs:annotation>
+    <xs:documentation>
+      Trigger XML Schema Definition
+    </xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="bool">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="true" />
+      <xs:enumeration value="false" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="trigger">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" />
+      <xs:attribute name="is_async" type="bool" use="required"/>
+      <xs:attribute name="is_enable" type="bool" use="required"/>
+      <xs:attribute name=" type" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="group">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="trigger" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="triggers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="group" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
