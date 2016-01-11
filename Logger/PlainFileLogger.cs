@@ -20,7 +20,7 @@ namespace Easy.Public.MyLog
             logText.Append("message : ");
             logText.AppendFormat("{0}", log.Message);
             logText.AppendLine("datetime : ");
-            logText.AppendLine(log.DateTime.ToString());
+            logText.Append(log.DateTime.ToString());
             logText.AppendLine("=====================================================");
 
             String logFile = this.GetLogFileName(log.LogLevel);
