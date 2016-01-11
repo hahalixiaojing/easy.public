@@ -98,6 +98,7 @@
     <Compile Include="Logger\LogManager.cs" />
     <Compile Include="Logger\LogSqlFormatter.cs" />
     <Compile Include="Logger\PlainFileLogger.cs" />
+    <Compile Include="Logger\RemoteLogger.cs" />
     <Compile Include="MessageTemplate.cs" />
     <Compile Include="MvcSecurity\ApiAuthorize.cs">
       <SubType>Code</SubType>

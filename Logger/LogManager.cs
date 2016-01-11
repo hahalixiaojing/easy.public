@@ -6,6 +6,7 @@ using System.Threading;
 using System.Configuration;
 using System.Reflection;
 using Easy.Public;
+using System.Threading.Tasks;
 
 namespace Easy.Public.MyLog
 {
@@ -13,23 +14,34 @@ namespace Easy.Public.MyLog
     {
         private static Queue<Log> queue = new Queue<Log>(30);
         private static Semaphore semaphore = new Semaphore(30, 30);
-        private static IMyLogger myLog;
+        private static IList<IMyLogger> myLog;
 
         static LogManager()
         {
+            myLog = new List<IMyLogger>();
+
             IsLogged = StringHelper.ToBoolean(ConfigurationManager.AppSettings[LogConfig.LOG_IS_LOGGED], false);
             if (IsLogged)
             {
-                LogManager.myLog = GetMyLogger();
+                LogManager.myLog.Add(GetMyLogger());
 
                 if (LogManager.myLog != null)
                 {
-                    LogManager.myLog.Initialization();
+                    foreach (var item in myLog)
+                    {
+                        item.Initialization();
+                    }
                     LogManager.LogLevel = StringHelper.ToEnum<LogLevel>(ConfigurationManager.AppSettings[LogConfig.LOG_LEVEL], LogLevel.Verbose);
                     Thread thread = new Thread(new ThreadStart(LogManager.Work));
                     thread.Start();
                 }
             }
+        }
+
+        public static void Register(IMyLogger log)
+        {
+            log.Initialization();
+            myLog.Add(log);
         }
 
         private static IMyLogger GetMyLogger()
@@ -140,7 +152,13 @@ namespace Easy.Public.MyLog
                 {
                     try
                     {
-                        myLog.WriteLog(log);
+                        foreach (var l in myLog)
+                        {
+                            Task.Factory.StartNew(() =>
+                            {
+                                l.WriteLog(log);
+                            });
+                        }
                     }
                     catch (Exception e) { throw e; }
                 }
