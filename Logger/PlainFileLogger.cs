@@ -19,7 +19,7 @@ namespace Easy.Public.MyLog
             logText.AppendLine(log.Tag);
             logText.Append("message : ");
             logText.AppendFormat("{0}", log.Message);
-            logText.Append("datetime : ");
+            logText.AppendLine("datetime : ");
             logText.AppendLine(log.DateTime.ToString());
             logText.AppendLine("=====================================================");
 
