@@ -24,7 +24,9 @@ namespace Easy.Public.MyLog
         {
             try
             {
-                HttpRequestClient.Request(this.Url, "POST", false).Send(new StringBuilder(JsonConvert.SerializeObject(log)));
+                var req = HttpRequestClient.Request(this.Url, "POST", false);
+                req.ContentType = "application/json";
+                req.Send(new StringBuilder(JsonConvert.SerializeObject(log)));
             }
             catch { }
         }
