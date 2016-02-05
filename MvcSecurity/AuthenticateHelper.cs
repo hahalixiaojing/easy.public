@@ -149,7 +149,7 @@ namespace Easy.Public.MvcSecurity
         /// </summary>
         /// <param name="userTicket"></param>
         /// <returns></returns>
-        internal static AuthenticateUserTicket AuthenticateTicket()
+        public static AuthenticateUserTicket AuthenticateTicket()
         {
             String ticketString = GetTicket();
             if (String.IsNullOrEmpty(ticketString))
