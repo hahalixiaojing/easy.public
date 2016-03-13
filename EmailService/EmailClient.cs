@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net.Mail;
 using System.Net;
-using System.IO;
-using System.Xml;
-using System.Xml.XPath;
 
 namespace Easy.Public.Email
 {
