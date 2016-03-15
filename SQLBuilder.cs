@@ -23,6 +23,12 @@ namespace Easy.Public
         {
             sqlSegments.Add(WHERE);
         }
+
+        public void Append(string sql)
+        {
+            sqlSegments.Add(new SqlSegment() { IsAppend = true, Sql = sql });
+        }
+
         public void Append(bool condition, String prepend, String sql)
         {
             if (condition)

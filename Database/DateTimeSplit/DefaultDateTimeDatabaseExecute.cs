@@ -10,7 +10,7 @@ namespace Easy.Public.Database.DateTimeSplit
     {
         public void Add<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase, ENTITY> execute)
         {
-            execute.Invoke(DateTimeSplitDatabaseManager.Instance.First, entity);
+            execute.Invoke(DateTimeSplitDatabaseManager.Instance.Latest, entity);
         }
         public void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> excute)
         {
@@ -51,7 +51,88 @@ namespace Easy.Public.Database.DateTimeSplit
 
         public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
         {
+            return this.FindByIds<ENTITY, KEY>(ids, DateTimeSplitDatabaseManager.Instance.All, execute);
+        }
+
+
+        public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
+        {
+            return this.FindByIds<ENTITY, KEY>(ids, DateTimeSplitDatabaseManager.Instance.Select(start, end), execute);
+        }
+
+        public void Remove<KEY>(KEY id, Action<IDateTimeSplitDatabase, KEY> execute)
+        {
             var tasks = DateTimeSplitDatabaseManager.Instance.All.Select(m =>
+            {
+                var t = new Task(() =>
+                {
+                    execute.Invoke(m, id);
+                });
+                t.Start();
+                return t;
+            });
+
+            Task.WhenAll(tasks).Wait();
+        }
+
+        public void Remove<KEY>(KEY id, DateTime datetime,Action<IDateTimeSplitDatabase,KEY> execute)
+        {
+            var database = DateTimeSplitDatabaseManager.Instance.Select(datetime);
+            execute.Invoke(database, id);
+        }
+
+        public void RemoveAll(Action<IDateTimeSplitDatabase> execute)
+        {
+            var tasks = DateTimeSplitDatabaseManager.Instance.All.Select(m =>
+             {
+                 var t = new Task(() =>
+                 {
+                     execute.Invoke(m);
+                 });
+                 return t;
+             });
+
+            Task.WhenAll(tasks).Wait();
+        }
+
+        public DataTimeDataList<ENTITY> Select<ENTITY>(Query query,
+            Func<IDateTimeSplitDatabase, Query, DataTimeDataList<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query, Int64> countExecute)
+        {
+            var databaseList = DateTimeSplitDatabaseManager.Instance.Select(query.Start, query.End, query.OrderBy);
+            var startDatabase = query.DatabaseIndex == 0 ? databaseList.First() : DateTimeSplitDatabaseManager.Instance[query.DatabaseIndex];
+
+
+            var tasks = databaseList.Select(m =>
+            {
+                var task = new Task<Int64>(() =>
+                {
+                    return countExecute.Invoke(m, query);
+                });
+                task.Start();
+                return task;
+            });
+            long totalRows = Task.WhenAll(tasks).Result.Sum();
+
+            //Task.Factory.
+
+            throw new NotImplementedException();
+
+        }
+
+        public void Update<ENTITY>(ENTITY entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update<ENTITY>(ENTITY entity, DateTime datetime)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, IEnumerable<IDateTimeSplitDatabase> databases, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
+        {
+            var tasks = databases.Select(m =>
             {
                 var t = new Task<IEnumerable<ENTITY>>(() => {
                     return execute.Invoke(m, ids);
@@ -73,41 +154,6 @@ namespace Easy.Public.Database.DateTimeSplit
                 }
             }
             return dataList;
-        }
-
-        public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove<KEY>(KEY id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove<KEY>(KEY id, DateTime datetime)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public DataTimeDataList<ENTITY> Select<ENTITY>(Query query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update<ENTITY>(ENTITY entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update<ENTITY>(ENTITY entity, DateTime datetime)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end);
+        IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute);
         /// <summary>
         /// 更新操作所有数据库都执行操作
         /// </summary>
@@ -71,27 +71,28 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <summary>
         /// 移除所有的数据库数据
         /// </summary>
-        void RemoveAll();
+        void RemoveAll(Action<IDateTimeSplitDatabase> execute);
         /// <summary>
         /// 移除指定ID的数所在，在所有数据都要执行
         /// </summary>
         /// <typeparam name="KEY"></typeparam>
         /// <param name="id"></param>
-        void Remove<KEY>(KEY id);
+        void Remove<KEY>(KEY id, Action<IDateTimeSplitDatabase, KEY> execute);
         /// <summary>
         /// 删除操作，根据指定的时间定位数据库
         /// </summary>
         /// <typeparam name="KEY"></typeparam>
         /// <param name="id"></param>
         /// <param name="datetime"></param>
-        void Remove<KEY>(KEY id, DateTime datetime);
+        void Remove<KEY>(KEY id, DateTime datetime, Action<IDateTimeSplitDatabase, KEY> execute);
         /// <summary>
         /// 查询数据
         /// </summary>
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        DataTimeDataList<ENTITY> Select<ENTITY>(Query query);
+        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, DataTimeDataList<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query, Int64> countExecute);
         /// <summary>
         /// 聚合计算，例如 count ,min max avg sum等
         /// </summary>

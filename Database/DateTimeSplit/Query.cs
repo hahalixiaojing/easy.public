@@ -4,6 +4,12 @@ namespace Easy.Public.Database.DateTimeSplit
 {
     public class Query
     {
+
+        public Query()
+        {
+            this.OrderBy = OrderBy.DESC;
+            this.Pageize = 20;
+        }
         /// <summary>
         /// 最后一条记录所在的数据库索引
         /// </summary>
@@ -28,5 +34,15 @@ namespace Easy.Public.Database.DateTimeSplit
         /// 数据编移位置（index索引位置）
         /// </summary>
         public int Offset { get; set; }
+        /// <summary>
+        /// 订单排序类型
+        /// </summary>
+        public OrderBy OrderBy { get; set; }
+    }
+
+    public enum OrderBy
+    {
+        DESC,
+        ASC
     }
 }

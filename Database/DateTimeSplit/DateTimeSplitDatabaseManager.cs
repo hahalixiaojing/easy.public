@@ -37,6 +37,16 @@ namespace Easy.Public.Database.DateTimeSplit
         {
             _DATABASE.Add(database);
         }
+
+        public IDateTimeSplitDatabase this[int index]
+        {
+            get
+            {
+                return _DATABASE[index];
+            }
+        }
+
+
         /// <summary>
         /// 根据时间范围选择合适的数据库
         /// </summary>
@@ -46,6 +56,40 @@ namespace Easy.Public.Database.DateTimeSplit
         public IEnumerable<IDateTimeSplitDatabase> Select(DateTime start,DateTime end)
         {
             return _DATABASE.Where(m => m.IsSelected(start, end));
+        }
+        public IEnumerable<IDateTimeSplitDatabase> Select(DateTime? start, DateTime? end, OrderBy orderBy)
+        {
+            if(start == null && end == null)
+            {
+                if(orderBy == OrderBy.ASC)
+                {
+                    return _DATABASE.OrderBy(m => m.Index);
+                }
+                return _DATABASE.OrderByDescending(m => m.Index);
+            }
+
+            if(start.HasValue && end == null)
+            {
+                if(orderBy == OrderBy.ASC)
+                {
+                   return  _DATABASE.Where(m => m.Index <= Select(start.Value.Date).Index).OrderBy(m => m.Index);
+                }
+                return _DATABASE.Where(m => m.Index <= Select(start.Value.Date).Index).OrderByDescending(m => m.Index);
+            }
+            if(end.HasValue && start == null)
+            {
+                if(orderBy == OrderBy.ASC)
+                {
+                    return _DATABASE.Where(m => m.Index >= Select(start.Value.Date).Index).OrderBy(m => m.Index);
+                }
+                return _DATABASE.Where(m => m.Index >= Select(start.Value.Date).Index).OrderByDescending(m => m.Index);
+            }
+
+            if(orderBy == OrderBy.ASC)
+            {
+                return Select(start.Value, end.Value).OrderBy(m => m.Index);
+            }
+            return Select(start.Value, end.Value).OrderByDescending(m => m.Index);
         }
         /// <summary>
         /// 根据时间点选择合适的数据库
@@ -72,7 +116,7 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <summary>
         /// 第一个库（时间最近的库）
         /// </summary>
-        public IDateTimeSplitDatabase First
+        public IDateTimeSplitDatabase Latest
         {
             get
             {
@@ -82,7 +126,8 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <summary>
         /// 最后一个库（时间最远的库）
         /// </summary>
-        public IDateTimeSplitDatabase Last
+        public IDateTimeSplitDatabase Oldest
+
         {
             get
             {
