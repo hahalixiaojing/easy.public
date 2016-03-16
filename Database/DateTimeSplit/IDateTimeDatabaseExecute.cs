@@ -91,7 +91,7 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, DataTimeDataList<ENTITY>> dataExecute,
+        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, long, IEnumerable<ENTITY>> dataExecute,
             Func<IDateTimeSplitDatabase, Query, Int64> countExecute);
         /// <summary>
         /// 聚合计算，例如 count ,min max avg sum等

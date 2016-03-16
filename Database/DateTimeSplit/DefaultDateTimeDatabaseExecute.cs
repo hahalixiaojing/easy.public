@@ -96,12 +96,10 @@ namespace Easy.Public.Database.DateTimeSplit
         }
 
         public DataTimeDataList<ENTITY> Select<ENTITY>(Query query,
-            Func<IDateTimeSplitDatabase, Query, DataTimeDataList<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query,long, IEnumerable<ENTITY>> dataExecute,
             Func<IDateTimeSplitDatabase, Query, Int64> countExecute)
         {
             var databaseList = DateTimeSplitDatabaseManager.Instance.Select(query.Start, query.End, query.OrderBy);
-            var startDatabase = query.DatabaseIndex == 0 ? databaseList.First() : DateTimeSplitDatabaseManager.Instance[query.DatabaseIndex];
-
 
             var tasks = databaseList.Select(m =>
             {
@@ -112,12 +110,44 @@ namespace Easy.Public.Database.DateTimeSplit
                 task.Start();
                 return task;
             });
-            long totalRows = Task.WhenAll(tasks).Result.Sum();
 
-            //Task.Factory.
+            long[] databaseRows = Task.WhenAll(tasks).Result;
+            long absoluteOffset = (query.PageIndex - 1) * query.PageSize;
 
-            throw new NotImplementedException();
+            long endOffset = 0;
+            int databaseIndex = 0;
+            long relativeDatabaseOffset = 0;
+            for (var i = 0; i < databaseRows.Length; i++)
+            {
+                long startOffset = endOffset;
+                endOffset = endOffset + databaseRows[i];
 
+                if (absoluteOffset >= startOffset && absoluteOffset <= endOffset)
+                {
+                    databaseIndex = i;
+                    relativeDatabaseOffset = absoluteOffset - startOffset;
+                    break;
+                }
+            }
+            //TODO:需要找到当前数据库具体的偏移位置
+            IDateTimeSplitDatabase database = databaseList.ToArray()[databaseIndex];
+
+            List<ENTITY> rows = new List<ENTITY>();
+            while (rows.Count < query.PageSize)
+            {
+                var thisDatabaseDataList = dataExecute.Invoke(database, query, relativeDatabaseOffset);
+                rows.AddRange(thisDatabaseDataList);
+
+                if (databaseIndex + 1 > databaseList.Count())
+                {
+                    break;
+                }
+                database = databaseList.ToArray()[databaseIndex + 1];
+               
+            }
+
+            var actualReturnRows = rows.Take(query.PageSize);
+            return new DataTimeDataList<ENTITY>(rows, databaseRows.Sum());
         }
 
         public void Update<ENTITY>(ENTITY entity)

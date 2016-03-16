@@ -35,6 +35,24 @@ namespace Easy.Public
             }
             return list;
         }
+
+        public static string GetText(int[] keys, string[] text, int currentKeys, string defaultText)
+        {
+            int index = 0 ;
+            for(var i = 0; i < keys.Length; i++)
+            {
+                if(currentKeys == keys[i])
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if(index == 0)
+            {
+                return defaultText;
+            }
+            return text[index];
+        }
     }
 }
 
