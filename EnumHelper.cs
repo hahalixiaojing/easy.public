@@ -38,7 +38,7 @@ namespace Easy.Public
 
         public static string GetText(int[] keys, string[] text, int currentKeys, string defaultText)
         {
-            int index = 0 ;
+            int index = -1 ;
             for(var i = 0; i < keys.Length; i++)
             {
                 if(currentKeys == keys[i])
@@ -47,7 +47,7 @@ namespace Easy.Public
                     break;
                 }
             }
-            if(index == 0)
+            if(index == -1)
             {
                 return defaultText;
             }
