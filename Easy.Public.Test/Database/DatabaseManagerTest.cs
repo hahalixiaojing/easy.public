@@ -73,6 +73,14 @@ namespace Easy.Public.Test.Database
             Assert.AreEqual(item2.Item1, result2.Item1);
             Assert.AreEqual(item2.Item2, result2.Item2);
             Assert.AreEqual(item2.Item3, result2.Item3);
+
+
+            var datalist = exector.FindByIds(new int[2] { 2, 3 }, (database, ids) => {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                return d.Where(m => ids.Contains(m.Item1));
+            });
+
+            Assert.AreEqual(2, datalist.Count());
         }
     }
 }
