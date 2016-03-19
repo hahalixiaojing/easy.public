@@ -81,9 +81,9 @@
     <Compile Include="Cryptography\SHA256Helper.cs" />
     <Compile Include="Cryptography\MD5Helper.cs" />
     <Compile Include="Cryptography\RSAHelper.cs" />
-    <Compile Include="Database\DatabaseExecute.cs" />
+    <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Database\DateTimeSplit\DateTimeDataList.cs" />
-    <Compile Include="Database\DateTimeSplit\DateTimeSplitDatabaseManager.cs" />
+    <Compile Include="Database\DateTimeSplit\DateTimeSplitDatabaseSelector.cs" />
     <Compile Include="Database\DateTimeSplit\DefaultDateTimeDatabaseExecute.cs" />
     <Compile Include="Database\DateTimeSplit\BaseDateTimeSplitDatabase.cs" />
     <Compile Include="Database\DateTimeSplit\IDateTimeSplitDatabase.cs" />

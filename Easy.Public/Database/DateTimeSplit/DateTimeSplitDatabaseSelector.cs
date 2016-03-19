@@ -4,40 +4,18 @@ using System.Linq;
 
 namespace Easy.Public.Database.DateTimeSplit
 {
-    public class DateTimeSplitDatabaseManager
+    public  class DateTimeSplitDatabaseSelector
     {
-        private static object lockObj = new object();
-        private static readonly IList<IDateTimeSplitDatabase> _DATABASE = new List<IDateTimeSplitDatabase>();
-        private static DateTimeSplitDatabaseManager _instance;
+        private  IList<IDateTimeSplitDatabase> _DATABASE = new List<IDateTimeSplitDatabase>();
 
-        private DateTimeSplitDatabaseManager()
+        public DateTimeSplitDatabaseSelector()
         {
 
         }
-
-        public static DateTimeSplitDatabaseManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    lock (lockObj)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new DateTimeSplitDatabaseManager();
-                        }
-                    }
-                }
-                return _instance;
-            }
-        }
-
         public void Register(IDateTimeSplitDatabase database)
         {
             _DATABASE.Add(database);
         }
-
         public IDateTimeSplitDatabase this[int index]
         {
             get

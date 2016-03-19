@@ -8,13 +8,21 @@ namespace Easy.Public.Database.DateTimeSplit
 {
     public class DefaultDateTimeDatabaseExecute : IDateTimeDatabaseExecute
     {
+        private readonly DateTimeSplitDatabaseSelector selector;
+
+        public DefaultDateTimeDatabaseExecute(DateTimeSplitDatabaseSelector manager)
+        {
+            this.selector = manager;
+        }
+
         public void Add<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase, ENTITY> execute)
         {
-            execute.Invoke(DateTimeSplitDatabaseManager.Instance.Latest, entity);
+            execute.Invoke(selector.Latest, entity);
         }
         public void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> excute)
         {
-            excute.Invoke(DateTimeSplitDatabaseManager.Instance.Select(datetime), entity);
+            var database = selector.Select(datetime);
+            excute.Invoke(database, entity);
         }
 
         public T Scalar<T>() where T : struct
@@ -29,12 +37,12 @@ namespace Easy.Public.Database.DateTimeSplit
 
         public ENTITY FindBy<ENTITY, KEY>(KEY id, DateTime datetime, Func<IDateTimeSplitDatabase, KEY, ENTITY> execute)
         {
-            return execute.Invoke(DateTimeSplitDatabaseManager.Instance.Select(datetime), id);
+            return execute.Invoke(selector.Select(datetime), id);
         }
 
         public ENTITY FindBy<ENTITY, KEY>(KEY id, Func<IDateTimeSplitDatabase,KEY, ENTITY> execute)
         {
-            var tasks = DateTimeSplitDatabaseManager.Instance.All.Select(m =>
+            var tasks = selector.All.Select(m =>
              {
                  var t = new Task<ENTITY>(() =>
                  {
@@ -51,18 +59,18 @@ namespace Easy.Public.Database.DateTimeSplit
 
         public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
         {
-            return this.FindByIds<ENTITY, KEY>(ids, DateTimeSplitDatabaseManager.Instance.All, execute);
+            return this.FindByIds<ENTITY, KEY>(ids, selector.All, execute);
         }
 
 
         public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
         {
-            return this.FindByIds<ENTITY, KEY>(ids, DateTimeSplitDatabaseManager.Instance.Select(start, end), execute);
+            return this.FindByIds<ENTITY, KEY>(ids, selector.Select(start, end), execute);
         }
 
         public void Remove<KEY>(KEY id, Action<IDateTimeSplitDatabase, KEY> execute)
         {
-            var tasks = DateTimeSplitDatabaseManager.Instance.All.Select(m =>
+            var tasks = selector.All.Select(m =>
             {
                 var t = new Task(() =>
                 {
@@ -77,13 +85,13 @@ namespace Easy.Public.Database.DateTimeSplit
 
         public void Remove<KEY>(KEY id, DateTime datetime,Action<IDateTimeSplitDatabase,KEY> execute)
         {
-            var database = DateTimeSplitDatabaseManager.Instance.Select(datetime);
+            var database = selector.Select(datetime);
             execute.Invoke(database, id);
         }
 
         public void RemoveAll(Action<IDateTimeSplitDatabase> execute)
         {
-            var tasks = DateTimeSplitDatabaseManager.Instance.All.Select(m =>
+            var tasks = selector.All.Select(m =>
              {
                  var t = new Task(() =>
                  {
@@ -99,7 +107,7 @@ namespace Easy.Public.Database.DateTimeSplit
             Func<IDateTimeSplitDatabase, Query,long, IEnumerable<ENTITY>> dataExecute,
             Func<IDateTimeSplitDatabase, Query, Int64> countExecute)
         {
-            var databaseList = DateTimeSplitDatabaseManager.Instance.Select(query.Start, query.End, query.OrderBy);
+            var databaseList = selector.Select(query.Start, query.End, query.OrderBy);
 
             var tasks = databaseList.Select(m =>
             {
