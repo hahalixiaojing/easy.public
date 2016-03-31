@@ -27,12 +27,6 @@ namespace Easy.Public.Database.DateTimeSplit
         /// </summary>
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="entity"></param>
-        void Add<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase, ENTITY> execute);
-        /// <summary>
-        /// 添加记录
-        /// </summary>
-        /// <typeparam name="ENTITY"></typeparam>
-        /// <param name="entity"></param>
         /// <param name="datetime"></param>
         /// <param name="excute"></param>
         void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> excute);
@@ -91,8 +85,8 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, long, IEnumerable<ENTITY>> dataExecute,
-            Func<IDateTimeSplitDatabase, Query, Int64> countExecute);
+        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, int, IEnumerable<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query, int> countExecute);
         /// <summary>
         /// 聚合计算，例如 count ,min max avg sum等
         /// </summary>

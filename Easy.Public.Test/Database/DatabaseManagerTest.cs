@@ -27,6 +27,8 @@ namespace Easy.Public.Test.Database
 
             DatabaseManager.RegisterDataTimeDatabaseExecute("default", executor);
         }
+
+
         [NUnit.Framework.Test]
         public void AddTest()
         {
@@ -54,7 +56,7 @@ namespace Easy.Public.Test.Database
                 d.Add(data);
             });
 
-            var result1 = exector.FindBy<Tuple<int, string, DateTime>, int>(1, (database, id) =>
+            var result1 = exector.FindBy(1, (database, id) =>
             {
                 var d = database.Database as List<Tuple<int, string, DateTime>>;
                 return d.Where(m => m.Item1 == id).FirstOrDefault();
@@ -64,7 +66,7 @@ namespace Easy.Public.Test.Database
             Assert.AreEqual(item.Item2, result1.Item2);
             Assert.AreEqual(item.Item3, result1.Item3);
 
-            var result2 = exector.FindBy<Tuple<int, string, DateTime>, int>(2, (database, id) =>
+            var result2 = exector.FindBy(2, (database, id) =>
             {
                 var d = database.Database as List<Tuple<int, string, DateTime>>;
                 return d.Where(m => m.Item1 == id).FirstOrDefault();
@@ -81,6 +83,82 @@ namespace Easy.Public.Test.Database
             });
 
             Assert.AreEqual(2, datalist.Count());
+
+          
+
+            
+        }
+        [Test]
+        public void SelectTest()
+        {
+            var exector = DatabaseManager.DataTimeDatabaseExecute("default");
+
+            var item = new Tuple<int, string, DateTime>(1, "a", DateTime.Now.AddMonths(-2));
+            exector.Add(item, DateTime.Now.AddMonths(-2), (database, data) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Add(data);
+            });
+
+
+            var item2 = new Tuple<int, string, DateTime>(2, "b", DateTime.Now.AddMonths(-1));
+            exector.Add(item2, DateTime.Now.AddMonths(-1), (database, data) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Add(data);
+            });
+
+            var item3 = new Tuple<int, string, DateTime>(3, "c", DateTime.Now);
+            exector.Add(item3, DateTime.Now, (database, data) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Add(data);
+            });
+
+            Func<IDateTimeSplitDatabase, Query, int, IEnumerable<Tuple<int, string, DateTime>>> datafunc = (database, query, offset) =>
+            {
+
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                return d.Skip(offset).Take(query.PageSize);
+            };
+
+            Func<IDateTimeSplitDatabase, Query, int> countFunc = (database, query) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                return d.Count;
+            };
+
+
+            var datalist = exector.Select(new Query() { PageIndex = 1, PageSize = 10 }, datafunc, countFunc);
+            Assert.AreEqual(datalist.Rows.Count(), 3);
+            Assert.AreEqual(datalist.TotalRows, 3);
+
+
+            datalist = exector.Select(new Query() { PageIndex = 2, PageSize = 10 }, datafunc, countFunc);
+
+            Assert.AreEqual(datalist.Rows.Count(), 0);
+            Assert.AreEqual(datalist.TotalRows, 3);
+
+            datalist = exector.Select(new Query() { PageIndex = 2, PageSize = 2 }, datafunc, countFunc);
+            Assert.AreEqual(datalist.Rows.Count(), 1);
+            Assert.AreEqual(datalist.TotalRows, 3);
+            Assert.AreEqual(datalist.Rows.First().Item1, 1);
+
+            datalist = exector.Select(new Query() { PageIndex = 1, PageSize = 3, OrderBy = OrderBy.ASC }, datafunc, countFunc);
+
+            Assert.AreEqual(datalist.Rows.Count(), 3);
+            Assert.AreEqual(datalist.TotalRows, 3);
+            Assert.AreEqual(datalist.Rows.First().Item1, 1);
+        }
+        [TearDown]
+        public void Clear()
+        {
+            var exector = DatabaseManager.DataTimeDatabaseExecute("default");
+            exector.RemoveAll((database) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Clear();
+            });           
         }
     }
 }

@@ -10,14 +10,9 @@ namespace Easy.Public.Database.DateTimeSplit
     {
         private readonly DateTimeSplitDatabaseSelector selector;
 
-        public DefaultDateTimeDatabaseExecute(DateTimeSplitDatabaseSelector manager)
+        public DefaultDateTimeDatabaseExecute(DateTimeSplitDatabaseSelector selector)
         {
-            this.selector = manager;
-        }
-
-        public void Add<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase, ENTITY> execute)
-        {
-            execute.Invoke(selector.Latest, entity);
+            this.selector = selector;
         }
         public void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> excute)
         {
@@ -62,7 +57,6 @@ namespace Easy.Public.Database.DateTimeSplit
             return this.FindByIds<ENTITY, KEY>(ids, selector.All, execute);
         }
 
-
         public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
         {
             return this.FindByIds<ENTITY, KEY>(ids, selector.Select(start, end), execute);
@@ -97,6 +91,7 @@ namespace Easy.Public.Database.DateTimeSplit
                  {
                      execute.Invoke(m);
                  });
+                 t.Start();
                  return t;
              });
 
@@ -104,14 +99,14 @@ namespace Easy.Public.Database.DateTimeSplit
         }
 
         public DataTimeDataList<ENTITY> Select<ENTITY>(Query query,
-            Func<IDateTimeSplitDatabase, Query,long, IEnumerable<ENTITY>> dataExecute,
-            Func<IDateTimeSplitDatabase, Query, Int64> countExecute)
+            Func<IDateTimeSplitDatabase, Query,int, IEnumerable<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query, int> countExecute)
         {
             var databaseList = selector.Select(query.Start, query.End, query.OrderBy);
 
             var tasks = databaseList.Select(m =>
             {
-                var task = new Task<Int64>(() =>
+                var task = new Task<int>(() =>
                 {
                     return countExecute.Invoke(m, query);
                 });
@@ -119,25 +114,30 @@ namespace Easy.Public.Database.DateTimeSplit
                 return task;
             });
 
-            long[] databaseRows = Task.WhenAll(tasks).Result;
-            long absoluteOffset = (query.PageIndex - 1) * query.PageSize;
+            int[] databaseRows = Task.WhenAll(tasks).Result;
+            int absoluteOffset = (query.PageIndex - 1) * query.PageSize;
 
-            long endOffset = 0;
-            int databaseIndex = 0;
-            long relativeDatabaseOffset = 0;
+            int endOffset = 0;
+            int databaseIndex = -1;
+            int relativeDatabaseOffset = 0;
             for (var i = 0; i < databaseRows.Length; i++)
             {
-                long startOffset = endOffset;
-                endOffset = endOffset + databaseRows[i];
+                int startOffset = endOffset;
+                endOffset = endOffset + (databaseRows[i]);
 
-                if (absoluteOffset >= startOffset && absoluteOffset <= endOffset)
+                if (absoluteOffset >= startOffset && absoluteOffset < endOffset)
                 {
                     databaseIndex = i;
                     relativeDatabaseOffset = absoluteOffset - startOffset;
                     break;
                 }
             }
-            //TODO:需要找到当前数据库具体的偏移位置
+
+            if (databaseIndex == -1)
+            {
+                return new DataTimeDataList<ENTITY>(new ENTITY[0], databaseRows.Sum());
+            }
+            
             IDateTimeSplitDatabase database = databaseList.ToArray()[databaseIndex];
 
             List<ENTITY> rows = new List<ENTITY>();
@@ -145,13 +145,13 @@ namespace Easy.Public.Database.DateTimeSplit
             {
                 var thisDatabaseDataList = dataExecute.Invoke(database, query, relativeDatabaseOffset);
                 rows.AddRange(thisDatabaseDataList);
-
-                if (databaseIndex + 1 > databaseList.Count())
+                
+                databaseIndex = databaseIndex + 1;
+                if (databaseIndex >= databaseList.Count())
                 {
                     break;
                 }
-                database = databaseList.ToArray()[databaseIndex + 1];
-               
+                database = databaseList.ToArray()[databaseIndex];
             }
 
             var actualReturnRows = rows.Take(query.PageSize);

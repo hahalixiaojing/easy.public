@@ -106,11 +106,11 @@ namespace Easy.Public.HttpRequestService
 
     public static class HttpRequestClient
     {
-        public static HttpWebRequest Request(string url, string method, bool https)
+        public static HttpWebRequest Request(string url, string method, bool https, bool keepaplive = false)
         {
-            return Request(url, method, "", https);
+            return Request(url, method, "", https,keepaplive);
         }
-        public static HttpWebRequest Request(string url, string method, string contentType = "", bool https = false)
+        public static HttpWebRequest Request(string url, string method, string contentType = "", bool https = false, bool keepaplive = false)
         {
             if (https)
             {
@@ -118,6 +118,7 @@ namespace Easy.Public.HttpRequestService
             }
 
             HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            request.KeepAlive = keepaplive;
             request.Method = method;
 
             if (!string.IsNullOrWhiteSpace(contentType))
