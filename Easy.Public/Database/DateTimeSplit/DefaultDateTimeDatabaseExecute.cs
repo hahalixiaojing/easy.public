@@ -14,22 +14,40 @@ namespace Easy.Public.Database.DateTimeSplit
         {
             this.selector = selector;
         }
-        public void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> excute)
+        public void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> execute)
         {
             var database = selector.Select(datetime);
-            excute.Invoke(database, entity);
+            execute.Invoke(database, entity);
         }
-
-        public T Scalar<T>() where T : struct
+        public Int64 Count(Func<IDateTimeSplitDatabase, Int64> execute)
         {
-            throw new NotImplementedException();
-        }
+            var tasks = selector.All.Select(m =>
+            {
+                var t = new Task<Int64>(() =>
+                {
+                    return execute.Invoke(m);
+                });
+                t.Start();
+                return t;
+            });
 
-        public T Scalar<T>(Query query) where T : struct
+            return Task.WhenAll(tasks).Result.Sum();
+        }
+        public Int64 Count(Query query, Func<IDateTimeSplitDatabase,Query, Int64> execute)
         {
-            throw new NotImplementedException();
+            var databases = selector.Select(query.Start, query.End, OrderBy.DESC);
+            var tasks = databases.Select(m =>
+            {
+                var t = new Task<Int64>(() =>
+                {
+                    return execute.Invoke(m, query);
+                });
+                t.Start();
+                return t;
+            });
+            var result = Task.WhenAll(tasks);
+            return result.Result.Sum();
         }
-
         public ENTITY FindBy<ENTITY, KEY>(KEY id, DateTime datetime, Func<IDateTimeSplitDatabase, KEY, ENTITY> execute)
         {
             return execute.Invoke(selector.Select(datetime), id);
@@ -158,14 +176,22 @@ namespace Easy.Public.Database.DateTimeSplit
             return new DataTimeDataList<ENTITY>(rows, databaseRows.Sum());
         }
 
-        public void Update<ENTITY>(ENTITY entity)
+        public void Update<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase> execute)
         {
-            throw new NotImplementedException();
+            var tasks = selector.All.Select(m =>
+            {
+                var t = new Task(() =>
+                {
+                    execute.Invoke(m);
+                });
+                return t;
+            });
+            Task.WhenAll(tasks).Wait();
         }
-
-        public void Update<ENTITY>(ENTITY entity, DateTime datetime)
+        public void Update<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase,ENTITY> execute)
         {
-            throw new NotImplementedException();
+            var database = selector.Select(datetime);
+            execute.Invoke(database, entity);
         }
 
         private IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, IEnumerable<IDateTimeSplitDatabase> databases, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)

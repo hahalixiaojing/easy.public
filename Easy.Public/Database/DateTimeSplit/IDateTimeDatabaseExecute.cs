@@ -54,14 +54,14 @@ namespace Easy.Public.Database.DateTimeSplit
         /// </summary>
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="entity"></param>
-        void Update<ENTITY>(ENTITY entity);
+        void Update<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase> execute);
         /// <summary>
         /// 更新操作，根据指定的时间定位数据库
         /// </summary>
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="entity"></param>
         /// <param name="datetime"></param>
-        void Update<ENTITY>(ENTITY entity, DateTime datetime);
+        void Update<ENTITY>(ENTITY entity, DateTime datetime,Action<IDateTimeSplitDatabase, ENTITY> execute);
         /// <summary>
         /// 移除所有的数据库数据
         /// </summary>
@@ -88,17 +88,15 @@ namespace Easy.Public.Database.DateTimeSplit
         DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, int, IEnumerable<ENTITY>> dataExecute,
             Func<IDateTimeSplitDatabase, Query, int> countExecute);
         /// <summary>
-        /// 聚合计算，例如 count ,min max avg sum等
+        /// 聚合计算，count
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        T Scalar<T>(Query query) where T : struct;
+        Int64 Count(Query query, Func<IDateTimeSplitDatabase, Query, Int64> execute);
         /// <summary>
-        /// 聚合计算，例如 count ,min max avg sum等
+        /// 聚合计算 count
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        T Scalar<T>() where T : struct;
+        Int64 Count(Func<IDateTimeSplitDatabase, Int64> execute);
     }
 }

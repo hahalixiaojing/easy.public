@@ -16,7 +16,7 @@ namespace Easy.Public.Test.Database
         {
             var database1 = new MemoryListDateTimeSplitDatabase(new DateTime(2016, 1, 31), new DateTime(2016, 1, 1), 1);
             var database2 = new MemoryListDateTimeSplitDatabase(new DateTime(2016, 2, 29), new DateTime(2016, 2, 1), 2);
-            var database3 = new MemoryListDateTimeSplitDatabase(new DateTime(2016, 3, 31), new DateTime(2016, 3, 1), 3);
+            var database3 = new MemoryListDateTimeSplitDatabase(DateTime.Now, new DateTime(2016, 3, 1), 3);
 
             var seletor = new DateTimeSplitDatabaseSelector();
             seletor.Register(database1);
@@ -26,6 +26,61 @@ namespace Easy.Public.Test.Database
             var executor = new DefaultDateTimeDatabaseExecute(seletor);
 
             DatabaseManager.RegisterDataTimeDatabaseExecute("default", executor);
+        }
+        [Test]
+        public void CountTest()
+        {
+            var exector = DatabaseManager.DataTimeDatabaseExecute("default");
+
+            var item = new Tuple<int, string, DateTime>(1, "a", DateTime.Now.AddMonths(-2));
+            exector.Add(item, DateTime.Now.AddMonths(-2), (database, data) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Add(data);
+            });
+
+
+            var item2 = new Tuple<int, string, DateTime>(2, "b", DateTime.Now.AddMonths(-1));
+            exector.Add(item2, DateTime.Now.AddMonths(-1), (database, data) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Add(data);
+            });
+
+            var item3 = new Tuple<int, string, DateTime>(3, "c", DateTime.Now);
+            exector.Add(item3, DateTime.Now, (database, data) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+                d.Add(data);
+            });
+
+            var count = exector.Count((database) =>
+            {
+                var d = database.Database as List<Tuple<int, string, DateTime>>;
+
+                System.Diagnostics.Debug.WriteLine(database.Index);
+                return d.Count();
+
+            });
+
+            Assert.AreEqual(3, count);
+
+
+            count = exector.Count(new Query()
+            {
+                Start = DateTime.Now.AddDays(-10),
+                End = DateTime.Now.AddDays(1)
+
+            }, (database, query) =>
+             {
+                 var d = database.Database as List<Tuple<int, string, DateTime>>;
+                 System.Diagnostics.Debug.WriteLine(database.Index);
+
+                 return d.Count(m => m.Item3 > query.Start.Value && m.Item3 < query.End.Value);
+             });
+
+            Assert.AreEqual(1, count);
+
         }
 
 
