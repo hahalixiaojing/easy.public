@@ -96,6 +96,7 @@
     <Compile Include="EntityPropertyHelper.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="HttpService\HttpRequestClient.cs" />
+    <Compile Include="IpHelper.cs" />
     <Compile Include="Logger\ConsoleLogger.cs" />
     <Compile Include="Logger\DatabaseLogger.cs" />
     <Compile Include="Logger\IMyLogger.cs" />

@@ -57,7 +57,6 @@ namespace Easy.Public.Test.Database
             var count = exector.Count((database) =>
             {
                 var d = database.Database as List<Tuple<int, string, DateTime>>;
-
                 System.Diagnostics.Debug.WriteLine(database.Index);
                 return d.Count();
 
