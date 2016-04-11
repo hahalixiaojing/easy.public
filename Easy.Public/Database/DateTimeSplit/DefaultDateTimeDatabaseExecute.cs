@@ -117,14 +117,14 @@ namespace Easy.Public.Database.DateTimeSplit
         }
 
         public DataTimeDataList<ENTITY> Select<ENTITY>(Query query,
-            Func<IDateTimeSplitDatabase, Query,int, IEnumerable<ENTITY>> dataExecute,
-            Func<IDateTimeSplitDatabase, Query, int> countExecute)
+            Func<IDateTimeSplitDatabase, Query, long, IEnumerable<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query, long> countExecute)
         {
             var databaseList = selector.Select(query.Start, query.End, query.OrderBy);
 
             var tasks = databaseList.Select(m =>
             {
-                var task = new Task<int>(() =>
+                var task = new Task<long>(() =>
                 {
                     return countExecute.Invoke(m, query);
                 });
@@ -132,15 +132,15 @@ namespace Easy.Public.Database.DateTimeSplit
                 return task;
             });
 
-            int[] databaseRows = Task.WhenAll(tasks).Result;
+            long[] databaseRows = Task.WhenAll(tasks).Result;
             int absoluteOffset = (query.PageIndex - 1) * query.PageSize;
 
-            int endOffset = 0;
+            long endOffset = 0;
             int databaseIndex = -1;
-            int relativeDatabaseOffset = 0;
+            long relativeDatabaseOffset = 0;
             for (var i = 0; i < databaseRows.Length; i++)
             {
-                int startOffset = endOffset;
+                long startOffset = endOffset;
                 endOffset = endOffset + (databaseRows[i]);
 
                 if (absoluteOffset >= startOffset && absoluteOffset < endOffset)

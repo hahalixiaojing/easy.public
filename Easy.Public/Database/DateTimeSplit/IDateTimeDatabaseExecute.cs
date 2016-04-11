@@ -85,8 +85,8 @@ namespace Easy.Public.Database.DateTimeSplit
         /// <typeparam name="ENTITY"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, int, IEnumerable<ENTITY>> dataExecute,
-            Func<IDateTimeSplitDatabase, Query, int> countExecute);
+        DataTimeDataList<ENTITY> Select<ENTITY>(Query query, Func<IDateTimeSplitDatabase, Query, long, IEnumerable<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, Query, long> countExecute);
         /// <summary>
         /// 聚合计算，count
         /// </summary>

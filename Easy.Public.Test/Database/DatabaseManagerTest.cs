@@ -169,14 +169,14 @@ namespace Easy.Public.Test.Database
                 d.Add(data);
             });
 
-            Func<IDateTimeSplitDatabase, Query, int, IEnumerable<Tuple<int, string, DateTime>>> datafunc = (database, query, offset) =>
+            Func<IDateTimeSplitDatabase, Query, long, IEnumerable<Tuple<int, string, DateTime>>> datafunc = (database, query, offset) =>
             {
 
                 var d = database.Database as List<Tuple<int, string, DateTime>>;
-                return d.Skip(offset).Take(query.PageSize);
+                return d.Skip((int)offset).Take(query.PageSize);
             };
 
-            Func<IDateTimeSplitDatabase, Query, int> countFunc = (database, query) =>
+            Func<IDateTimeSplitDatabase, Query, long> countFunc = (database, query) =>
             {
                 var d = database.Database as List<Tuple<int, string, DateTime>>;
                 return d.Count;
