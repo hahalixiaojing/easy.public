@@ -46,8 +46,15 @@ namespace Easy.Public.Test
         {
             var value = IpHelper.IntranetIp4();
 
-            IpHelper.GetAvailablePort(value, 80, 9999);
+            IpHelper.GetAvailablePort("127.0.0.1", 4000, 9999);
 
+
+        }
+        [Test]
+        public void LoopbackIpTest()
+        {
+            string value = IpHelper.LoopbackIp();
+            Assert.AreEqual("127.0.0.1", value);
         }
     }
 }

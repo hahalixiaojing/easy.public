@@ -173,7 +173,7 @@ namespace Easy.Public.Database.DateTimeSplit
             }
 
             var actualReturnRows = rows.Take(query.PageSize);
-            return new DataTimeDataList<ENTITY>(rows, databaseRows.Sum());
+            return new DataTimeDataList<ENTITY>(actualReturnRows, databaseRows.Sum());
         }
 
         public void Update<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase> execute)

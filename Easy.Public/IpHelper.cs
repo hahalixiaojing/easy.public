@@ -4,25 +4,24 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Easy.Public
 {
     public static class IpHelper
     {
-        static readonly List<Tuple<uint, uint>> intranetRange = new List<Tuple<uint, uint>>();
+        //static readonly List<Tuple<IPAddress, IPAddress>> intranetRange = new List<Tuple<IPAddress, IPAddress>>();
 
         static IpHelper()
         {
-            intranetRange.Add(new Tuple<uint, uint>(BitConverter.ToUInt32(IPAddress.Parse("10.0.0.0").GetAddressBytes(), 0),
-               BitConverter.ToUInt32(IPAddress.Parse("10.255.255.255").GetAddressBytes(), 0)));
+            //intranetRange.Add(new Tuple<IPAddress, IPAddress>(IPAddress.Parse("10.0.0.0"),
+            //   IPAddress.Parse("10.255.255.255")));
 
-            intranetRange.Add(new Tuple<uint, uint>(BitConverter.ToUInt32(IPAddress.Parse("172.16.0.0").GetAddressBytes(), 0),
-                BitConverter.ToUInt32(IPAddress.Parse("172.31.255.255").GetAddressBytes(), 0)));
+            //intranetRange.Add(new Tuple<IPAddress, IPAddress>(IPAddress.Parse("172.16.0.0"),
+            //    IPAddress.Parse("172.31.255.255")));
 
-            intranetRange.Add(new Tuple<uint, uint>(BitConverter.ToUInt32(IPAddress.Parse("192.168.0.0").GetAddressBytes(),0),
-                BitConverter.ToUInt32(IPAddress.Parse("192.168.255.255").GetAddressBytes(),0)));
+            //intranetRange.Add(new Tuple<IPAddress, IPAddress>(IPAddress.Parse("192.168.0.0"),
+            //    IPAddress.Parse("192.168.255.255")));
+
         }
         /// <summary>
         /// 获得电脑IP4地址列表
@@ -45,10 +44,18 @@ namespace Easy.Public
             string[] ipList = Ip4List();
             foreach(var ip in ipList)
             {
-                uint tartgetIp = BitConverter.ToUInt32(IPAddress.Parse(ip).GetAddressBytes(), 0);
-                var hasAny = intranetRange.Any(m => tartgetIp >= m.Item1 && tartgetIp <= m.Item2);
+                byte[] bytes = IPAddress.Parse(ip).GetAddressBytes();
 
-                if (hasAny)
+                if (bytes[0] == 192 && bytes[1] == 168)
+                {
+                    return ip;
+                }
+                if(bytes[0] == 10)
+                {
+                    return ip;
+                }
+
+                if(bytes[0] == 172 && bytes[1]>=16 && bytes[1] <= 31)
                 {
                     return ip;
                 }
@@ -61,19 +68,19 @@ namespace Easy.Public
         /// <returns></returns>
         public static string InternetIp4()
         {
-            string[] ipList = Ip4List();
-            foreach (var ip in ipList)
-            {
-                uint tartgetIp = BitConverter.ToUInt32(IPAddress.Parse(ip).GetAddressBytes(), 0);
-                var hasAny = intranetRange.Any(m => tartgetIp >= m.Item1 && tartgetIp <= m.Item2);
+            string intranetIp4 = IntranetIp4();
+            return Ip4List().Where(m => m != intranetIp4 && !m.StartsWith("169")).FirstOrDefault();
 
-                if (!hasAny)
-                {
-                    return ip;
-                }
-            }
-            return string.Empty;
         }
+        /// <summary>
+        /// 127.0.0.1 IP地址
+        /// </summary>
+        /// <returns></returns>
+        public static string LoopbackIp()
+        {
+            return IPAddress.Loopback.ToString();
+        }
+
         /// <summary>
         /// 随机获得指定范围内可用的端口号
         /// </summary>
@@ -87,7 +94,7 @@ namespace Easy.Public
             IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
             var rand = new Random(Guid.NewGuid().GetHashCode());
 
-            var port = 80;// rand.Next(start, end + 1);
+            var port = rand.Next(start, end + 1);
             while (true)
             {
                 bool istry = false;
