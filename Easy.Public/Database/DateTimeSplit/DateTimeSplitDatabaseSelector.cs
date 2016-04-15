@@ -50,17 +50,17 @@ namespace Easy.Public.Database.DateTimeSplit
             {
                 if(orderBy == OrderBy.ASC)
                 {
-                   return  _DATABASE.Where(m => m.Index <= Select(start.Value.Date).Index).OrderBy(m => m.Index);
+                   return  _DATABASE.Where(m => m.Index >= Select(start.Value.Date).Index).OrderBy(m => m.Index);
                 }
-                return _DATABASE.Where(m => m.Index <= Select(start.Value.Date).Index).OrderByDescending(m => m.Index);
+                return _DATABASE.Where(m => m.Index >= Select(start.Value.Date).Index).OrderByDescending(m => m.Index);
             }
             if(end.HasValue && start == null)
             {
                 if(orderBy == OrderBy.ASC)
                 {
-                    return _DATABASE.Where(m => m.Index >= Select(start.Value.Date).Index).OrderBy(m => m.Index);
+                    return _DATABASE.Where(m => m.Index <= Select(end.Value.Date).Index).OrderBy(m => m.Index);
                 }
-                return _DATABASE.Where(m => m.Index >= Select(start.Value.Date).Index).OrderByDescending(m => m.Index);
+                return _DATABASE.Where(m => m.Index <= Select(end.Value.Date).Index).OrderByDescending(m => m.Index);
             }
 
             if(orderBy == OrderBy.ASC)

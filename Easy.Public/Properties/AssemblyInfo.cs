@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyCompanyAttribute("李晓静")]
-[assembly: AssemblyDescriptionAttribute("常用的工具类，如字符串转换，SQL组装，加密解密 文档生成，简单日志 WebService调用")]
+[assembly: AssemblyDescription("常用的工具类，如字符串转换，SQL组装，加密解密 文档生成，简单日志 WebService调用，本机IP获取以及可用端口获取帮助类")]
 // 将 ComVisible 设置为 false 使此程序集中的类型
 // 对 COM 组件不可见。如果需要从 COM 访问此程序集中的类型，
 // 则将该类型上的 ComVisible 特性设置为 true。
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.2.2")]
-[assembly: AssemblyFileVersion("1.0.2.2")]
+[assembly: AssemblyVersion("1.0.2.3")]
+[assembly: AssemblyFileVersion("1.0.2.3")]

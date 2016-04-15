@@ -14,10 +14,10 @@ namespace Easy.Public.Database.DateTimeSplit
         {
             this.selector = selector;
         }
-        public void Add<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase, ENTITY> execute)
+        public void Add(DateTime datetime, Action<IDateTimeSplitDatabase> execute)
         {
             var database = selector.Select(datetime);
-            execute.Invoke(database, entity);
+            execute.Invoke(database);
         }
         public Int64 Count(Func<IDateTimeSplitDatabase, Int64> execute)
         {
@@ -33,14 +33,14 @@ namespace Easy.Public.Database.DateTimeSplit
 
             return Task.WhenAll(tasks).Result.Sum();
         }
-        public Int64 Count(Query query, Func<IDateTimeSplitDatabase,Query, Int64> execute)
+        public Int64 Count(Query query, Func<IDateTimeSplitDatabase, Int64> execute)
         {
             var databases = selector.Select(query.Start, query.End, OrderBy.DESC);
             var tasks = databases.Select(m =>
             {
                 var t = new Task<Int64>(() =>
                 {
-                    return execute.Invoke(m, query);
+                    return execute.Invoke(m);
                 });
                 t.Start();
                 return t;
@@ -48,18 +48,18 @@ namespace Easy.Public.Database.DateTimeSplit
             var result = Task.WhenAll(tasks);
             return result.Result.Sum();
         }
-        public ENTITY FindBy<ENTITY, KEY>(KEY id, DateTime datetime, Func<IDateTimeSplitDatabase, KEY, ENTITY> execute)
+        public ENTITY FindBy<ENTITY>(DateTime datetime, Func<IDateTimeSplitDatabase, ENTITY> execute)
         {
-            return execute.Invoke(selector.Select(datetime), id);
+            return execute.Invoke(selector.Select(datetime));
         }
 
-        public ENTITY FindBy<ENTITY, KEY>(KEY id, Func<IDateTimeSplitDatabase,KEY, ENTITY> execute)
+        public ENTITY FindBy<ENTITY>(Func<IDateTimeSplitDatabase, ENTITY> execute)
         {
             var tasks = selector.All.Select(m =>
              {
                  var t = new Task<ENTITY>(() =>
                  {
-                     return execute.Invoke(m, id);
+                     return execute.Invoke(m);
                  });
                  t.Start();
                  return t;
@@ -70,23 +70,23 @@ namespace Easy.Public.Database.DateTimeSplit
             return results.Result.SingleOrDefault(m => m != null);
         }
 
-        public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
+        public IEnumerable<ENTITY> Select<ENTITY>(Func<IDateTimeSplitDatabase, IEnumerable<ENTITY>> execute)
         {
-            return this.FindByIds<ENTITY, KEY>(ids, selector.All, execute);
+            return this.Select<ENTITY>(selector.All, execute);
         }
 
-        public IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, DateTime start, DateTime end, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
+        public IEnumerable<ENTITY> Select<ENTITY>(DateTime start, DateTime end, Func<IDateTimeSplitDatabase, IEnumerable<ENTITY>> execute)
         {
-            return this.FindByIds<ENTITY, KEY>(ids, selector.Select(start, end), execute);
+            return this.Select<ENTITY>(selector.Select(start, end), execute);
         }
 
-        public void Remove<KEY>(KEY id, Action<IDateTimeSplitDatabase, KEY> execute)
+        public void Remove( Action<IDateTimeSplitDatabase> execute)
         {
             var tasks = selector.All.Select(m =>
             {
                 var t = new Task(() =>
                 {
-                    execute.Invoke(m, id);
+                    execute.Invoke(m);
                 });
                 t.Start();
                 return t;
@@ -95,30 +95,15 @@ namespace Easy.Public.Database.DateTimeSplit
             Task.WhenAll(tasks).Wait();
         }
 
-        public void Remove<KEY>(KEY id, DateTime datetime,Action<IDateTimeSplitDatabase,KEY> execute)
+        public void Remove(DateTime datetime,Action<IDateTimeSplitDatabase> execute)
         {
             var database = selector.Select(datetime);
-            execute.Invoke(database, id);
-        }
-
-        public void RemoveAll(Action<IDateTimeSplitDatabase> execute)
-        {
-            var tasks = selector.All.Select(m =>
-             {
-                 var t = new Task(() =>
-                 {
-                     execute.Invoke(m);
-                 });
-                 t.Start();
-                 return t;
-             });
-
-            Task.WhenAll(tasks).Wait();
+            execute.Invoke(database);
         }
 
         public DataTimeDataList<ENTITY> Select<ENTITY>(Query query,
-            Func<IDateTimeSplitDatabase, Query, long, IEnumerable<ENTITY>> dataExecute,
-            Func<IDateTimeSplitDatabase, Query, long> countExecute)
+            Func<IDateTimeSplitDatabase,long, IEnumerable<ENTITY>> dataExecute,
+            Func<IDateTimeSplitDatabase, long> countExecute)
         {
             var databaseList = selector.Select(query.Start, query.End, query.OrderBy);
 
@@ -126,7 +111,7 @@ namespace Easy.Public.Database.DateTimeSplit
             {
                 var task = new Task<long>(() =>
                 {
-                    return countExecute.Invoke(m, query);
+                    return countExecute.Invoke(m);
                 });
                 task.Start();
                 return task;
@@ -161,7 +146,7 @@ namespace Easy.Public.Database.DateTimeSplit
             List<ENTITY> rows = new List<ENTITY>();
             while (rows.Count < query.PageSize)
             {
-                var thisDatabaseDataList = dataExecute.Invoke(database, query, relativeDatabaseOffset);
+                var thisDatabaseDataList = dataExecute.Invoke(database, relativeDatabaseOffset);
                 rows.AddRange(thisDatabaseDataList);
                 
                 databaseIndex = databaseIndex + 1;
@@ -176,7 +161,7 @@ namespace Easy.Public.Database.DateTimeSplit
             return new DataTimeDataList<ENTITY>(actualReturnRows, databaseRows.Sum());
         }
 
-        public void Update<ENTITY>(ENTITY entity, Action<IDateTimeSplitDatabase> execute)
+        public void Update(Action<IDateTimeSplitDatabase> execute)
         {
             var tasks = selector.All.Select(m =>
             {
@@ -188,18 +173,18 @@ namespace Easy.Public.Database.DateTimeSplit
             });
             Task.WhenAll(tasks).Wait();
         }
-        public void Update<ENTITY>(ENTITY entity, DateTime datetime, Action<IDateTimeSplitDatabase,ENTITY> execute)
+        public void Update( DateTime datetime, Action<IDateTimeSplitDatabase> execute)
         {
             var database = selector.Select(datetime);
-            execute.Invoke(database, entity);
+            execute.Invoke(database);
         }
 
-        private IEnumerable<ENTITY> FindByIds<ENTITY, KEY>(KEY[] ids, IEnumerable<IDateTimeSplitDatabase> databases, Func<IDateTimeSplitDatabase, KEY[], IEnumerable<ENTITY>> execute)
+        private IEnumerable<ENTITY> Select<ENTITY>(IEnumerable<IDateTimeSplitDatabase> databases, Func<IDateTimeSplitDatabase, IEnumerable<ENTITY>> execute)
         {
             var tasks = databases.Select(m =>
             {
                 var t = new Task<IEnumerable<ENTITY>>(() => {
-                    return execute.Invoke(m, ids);
+                    return execute.Invoke(m);
 
                 });
                 t.Start();

@@ -31,7 +31,7 @@ namespace Easy.Public.Database.DateTimeSplit
 
         public bool IsSelected(DateTime datetime)
         {
-            if (datetime.Date <= this.Start && datetime.Date >= this.End)
+            if (datetime.Date >= this.Start.Date && datetime.Date <= this.End.Date)
             {
                 return true;
             }
@@ -40,11 +40,11 @@ namespace Easy.Public.Database.DateTimeSplit
 
         public bool IsSelected(DateTime start, DateTime end)
         {
-            if ((this.Start <= start.Date && this.Start.Date >=end.Date) || (this.End<=start.Date && this.End>= end.Date))
+            if ((this.Start.Date >= start.Date && this.Start.Date <=end.Date) || (this.End.Date >= start.Date && this.End.Date <= end.Date))
             {
                 return true;
             }
-            if(this.Start>= start.Date && this.End<= end.Date)
+            if(this.Start.Date >= start.Date && this.End.Date <= end.Date)
             {
                 return true;
             }
