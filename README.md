@@ -35,3 +35,16 @@ return builder.Sql();
 StringHelper.ToInt32("12",0); // 转换成 int类型 12 
 StringHelper.ToInt32("1顶起2",0); // 转换成 int类型 12 失败，则返回默认值 0
 ```
+
+## NullHelper类
+该类用于解决访问类实例属性性，导致出 未将对象引用至对象实例的错误,同时可以减少代代码null的条件判断
+```
+Customer customer = null;
+String name = NullHelper.IfNull(customer, string.Empty, m => m.Name);
+
+IfNull 方法
+第一个参数 要访问的类实例
+第三个参数 要访问类实例的属性
+第二个参数 如果类实例为 null,则返回 string.Empty
+
+```
