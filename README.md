@@ -48,3 +48,16 @@ IfNull 方法
 第二个参数 如果类实例为 null,则返回 string.Empty
 
 ```
+## DESHelper类
+
+DES加密和解密算法
+
+- Encrypt() 将指定字符串加密，并返回16进制编码的字符串
+- Decrypt() 将16进制加密字符串解密，并返回明文
+
+## MD5Helper类
+MD5加密
+
+- Encrypt() 将指定字符串进行md5加密，并返回16进制编码的字符串
+- Encrypt2() 将指定字符串进行md5加密，并返回字节数组
+ 
