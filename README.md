@@ -4,7 +4,7 @@
 - InternetIp4() 获得服务器的公网IP
 - GetAvailablePort() 随机获得指定IP的一个没有被使用的端口
 
-## SQLBuilder类，
+## SQLBuilder类
 
 该类用于生成动态 WHERE 查询条件，减少条件判断，减少字符串拼接错误
 
@@ -27,3 +27,11 @@ return builder.Sql();
 
 ```
 
+## StringHelper类
+
+该类用于将字符串类型转换成 数字 bool,等类型，如果转换失败，则可以指定默认值
+
+```
+StringHelper.ToInt32("12",0); // 转换成 int类型 12 
+StringHelper.ToInt32("1顶起2",0); // 转换成 int类型 12 失败，则返回默认值 0
+```
