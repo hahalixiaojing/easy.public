@@ -17,11 +17,11 @@ builder.Append(query.CustomerId > 0, "and", "CustomerId=@CustomerId");
 builder.Append(query.AccountId > 0, "and", "AccountId=@AccountId");
 return builder.Sql();
 
-如果 query.CustomerId > 0 query.AccountId == 0 则输入以下SQL
+如果 query.CustomerId>0 并且 query.AccountId==0 则输出以下SQL
 
 "WHERE CustomerId=@CustomerId and AccountId=@AccountId"
 
-如果 query.CustomerId == 0 query.AccountId > 0 则输入以下SQL
+如果 query.CustomerId==0 并且 query.AccountId>0 则输出以下SQL
 
 "WHERE AccountId=@AccountId"
 
