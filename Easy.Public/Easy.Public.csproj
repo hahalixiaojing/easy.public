@@ -84,7 +84,6 @@
     <Compile Include="Doc\ICustomNameGetter.cs" />
     <Compile Include="Doc\MemberTypeInfo.cs" />
     <Compile Include="Doc\XmlDoc.cs" />
-    <Compile Include="EmailService\EmailClient.cs" />
     <Compile Include="EntityPropertyHelper.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="HttpService\HttpRequestClient.cs" />
@@ -100,40 +99,6 @@
     <Compile Include="Logger\PlainFileLogger.cs" />
     <Compile Include="Logger\RemoteLogger.cs" />
     <Compile Include="MessageTemplate.cs" />
-    <Compile Include="MvcSecurity\ApiAuthorize.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\AuthenticateHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\AuthenticateModule.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\AuthenticateUser.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\AuthenticateUserTicket.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\AuthorizationAttribute.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\AuthorizationServiceFactory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\ConfigConst.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\IAuthorizationService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\ResourceName.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MvcSecurity\UserIdentity.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Mvc\ActionCommentAttribute.cs" />
     <Compile Include="Mvc\ActionDescription.cs" />
     <Compile Include="Mvc\ActionHelper.cs" />
     <Compile Include="Mvc\ControllerDescription.cs" />
@@ -143,7 +108,6 @@
     <Compile Include="StringHelper.cs" />
     <Compile Include="ImageService\ImageScaleParameter.cs" />
     <Compile Include="ImageService\ImageScaleUtility.cs" />
-    <Compile Include="ObjectSerializationHelper.cs" />
     <Compile Include="ValidateCodeHelper.cs" />
     <Compile Include="WebService\NamedParameter.cs" />
     <Compile Include="WebService\WcfServiceClient.cs" />

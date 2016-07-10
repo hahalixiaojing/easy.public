@@ -1,10 +1,7 @@
-﻿using Easy.Public.MvcSecurity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Web;
-using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 namespace Easy.Public.Mvc
@@ -95,9 +92,7 @@ namespace Easy.Public.Mvc
                     Name = type.Name.Replace("Controller", ""),
                     ControllerType = type,
                     UrlTemplate = url,
-                    Description = GetDesc(type),
                     ClassPath = type.FullName,
-                    IsIsAuthorization = IsAuthorization(type)
                 };
                 controllerDescList.Add(controllerDesc);
             }
@@ -115,28 +110,13 @@ namespace Easy.Public.Mvc
                 {
                     Name = method.Name,
                     Url = ReplaceUrl(controllerDesc.UrlTemplate, controllerDesc.Name, GetActionName(method)),
-                    Description = GetDesc(method),
                     ActionPath = String.Concat(controllerDesc.ClassPath, ".", method.Name),
-                    Alias = GetResourceName(method),
-                    IsAuthorization = controllerDesc.IsIsAuthorization ? controllerDesc.IsIsAuthorization : IsAuthorization(method),
                     MethodInfo = method
                 };
                 
                 actionDescList.Add(actionDesc);
             }
             return actionDescList;
-        }
-
-
-        private static Boolean IsAuthorization(MemberInfo m)
-        {
-            var auth = m.GetCustomAttributes(true).Where(t => t is AuthorizationAttribute).Select(t => t as AuthorizationAttribute);
-
-            if (auth.Count() > 0)
-            {
-                return true;
-            }
-            return false;
         }
         private static String GetActionName(MemberInfo m)
         {
@@ -147,26 +127,6 @@ namespace Easy.Public.Mvc
                 return actionName[0].Name;
             }
             return m.Name;
-        }
-        private static String GetResourceName(MemberInfo m)
-        {
-            var resourceName = m.GetCustomAttributes(false).Where(t => t is ResourceName).Select(t => t as ResourceName).ToArray();
-
-            if (resourceName.Length > 0)
-            {
-                return resourceName[0].Name;
-            }
-            return string.Empty;
-        }
-        private static String GetDesc(MemberInfo m)
-        {
-            var descList = m.GetCustomAttributes(true).ToArray().Where(t => t is DescriptionAttribute).Select(t=>t as DescriptionAttribute).ToArray();
-
-            if (descList.Length > 0)
-            {
-                return descList[0].Message;
-            }
-            return string.Empty;
         }
         private static String ReplaceUrl(String urlTemplate, string controllerName, string actionName)
         {
